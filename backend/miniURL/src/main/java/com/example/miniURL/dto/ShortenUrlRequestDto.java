@@ -1,2 +1,12 @@
-package com.example.miniURL.dto;public class ShortenUrlRequestDto {
+package com.example.miniURL.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class ShortenUrlRequestDto {
+
+    private String url;
+
 }
