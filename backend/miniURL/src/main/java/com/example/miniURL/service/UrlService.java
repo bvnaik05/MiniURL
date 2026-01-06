@@ -49,9 +49,13 @@ public class UrlService {
                 
                 log.info("Successfully shortened URL: {} -> {}", url, shortCode);
                 
-                //return meaningful data
+                //return meaningful data with full short URL
+                String baseUrl = "http://localhost:8080"; // TODO: Make this configurable for production
+                String shortUrl = baseUrl + "/" + shortCode;
+                
                 return ShortenUrlResponseDto.builder()
                         .shortCode(shortCode)
+                        .shortUrl(shortUrl)
                         .build();
                         
             } catch (DataIntegrityViolationException e){
@@ -92,5 +96,16 @@ public class UrlService {
                
        log.info("Cache miss - Fetching from DB for short code: {}", shortCode);
        return URI.create(urlToBeParsed);
+    }
+    
+    /**
+     * Get UrlEntity by short code (for analytics tracking)
+     * Used by UrlController to get the entity before redirecting
+     * 
+     * @param shortCode The short code to look up
+     * @return UrlEntity or null if not found
+     */
+    public UrlEntity getUrlEntityByShortCode(String shortCode) {
+        return urlRepository.findByShortCode(shortCode).orElse(null);
     }
 }

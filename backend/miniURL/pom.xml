@@ -97,6 +97,20 @@
 			<artifactId>bucket4j-core</artifactId>
 			<version>8.7.0</version>
 		</dependency>
+		
+		<!-- Analytics: User-Agent Parser (Browser/Device Detection) -->
+		<dependency>
+			<groupId>eu.bitwalker</groupId>
+			<artifactId>UserAgentUtils</artifactId>
+			<version>1.21</version>
+		</dependency>
+		
+		<!-- Analytics: IP Geolocation (Country/City Detection) -->
+		<dependency>
+			<groupId>com.maxmind.geoip2</groupId>
+			<artifactId>geoip2</artifactId>
+			<version>4.2.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
