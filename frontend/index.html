@@ -35,30 +35,37 @@
             <p class="tagline">Big links made tiny. Share instantly.</p>
         </div>
 
-        <!-- Glass Card -->
-        <div class="glass-card">
+        <!-- Two Column Layout -->
+        <div class="two-column-layout">
+            <!-- Left Column: URL Shortener -->
+            <div class="left-column">
+                <!-- Glass Card -->
+                <div class="glass-card"
             <!-- URL Input Section -->
             <div class="input-section">
-                <div class="input-wrapper">
-                    <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8.5 4H5.5C4.39543 4 3.5 4.89543 3.5 6V14C3.5 15.1046 4.39543 16 5.5 16H13.5C14.6046 16 15.5 15.1046 15.5 14V11" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M16.5 3L9.5 10" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M12.5 3H16.5V7" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <input 
-                        type="text" 
-                        id="urlInput" 
-                        placeholder="Paste your long URL here..."
-                        autocomplete="off"
-                        spellcheck="false"
-                    >
+                <label class="input-label">Enter the long URL here:</label>
+                <div>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.5 4H5.5C4.39543 4 3.5 4.89543 3.5 6V14C3.5 15.1046 4.39543 16 5.5 16H13.5C14.6046 16 15.5 15.1046 15.5 14V11" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M16.5 3L9.5 10" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M12.5 3H16.5V7" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="urlInput" 
+                            placeholder="Paste your long URL here..."
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                    </div>
+                    <button id="shortenBtn" class="shorten-btn">
+                        <span class="btn-text">Shorten</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 10H13M13 10L10 7M13 10L10 13" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
-                <button id="shortenBtn" class="shorten-btn">
-                    <span class="btn-text">Shorten</span>
-                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7 10H13M13 10L10 7M13 10L10 13" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
             </div>
 
             <!-- Loading State -->
@@ -94,19 +101,56 @@
                     Shorten Another URL
                 </button>
                 
-                <button id="viewAnalyticsBtn" class="view-analytics-btn">
+                <button id="viewAnalyticsBtn" class="view-analytics-btn" style="display: none;">
                     📊 View Analytics
                 </button>
             </div>
 
-            <!-- Analytics Dashboard -->
-            <div id="analyticsSection" class="analytics-section" style="display: none;">
-                <div class="analytics-header">
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <div class="error-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/>
+                        <path d="M12 8V12" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="16" r="1" fill="#EF4444"/>
+                    </svg>
+                </div>
+                <p class="error-message" id="errorMessage"></p>
+                <button id="tryAgainBtn" class="try-again-btn">Try Again</button>
+            </div>
+        </div>
+        </div>
+
+            <!-- Right Column: Analytics -->
+            <div class="right-column">
+                <div class="glass-card analytics-card">
+                    <h2 class="analytics-title">📊 Analytics Dashboard</h2>
+                    
+                    <!-- Analytics Input Section -->
+                    <div class="analytics-input-section">
+                        <label class="analytics-label">Enter Short URL to view analytics:</label>
+                        <div class="analytics-input-wrapper">
+                            <input 
+                                type="text" 
+                                id="analyticsUrlInput" 
+                                placeholder="e.g., http://localhost:8080/abc123"
+                                class="analytics-url-input"
+                            >
+                            <button id="fetchAnalyticsBtn" class="fetch-analytics-btn">
+                                View
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Dashboard -->
+                    <!-- Analytics Dashboard -->
+                    <div id="analyticsSection" class="analytics-section">
+                <div class="analytics-header" style="display: none;">
                     <h2>📊 URL Analytics</h2>
-                    <button id="closeAnalyticsBtn" class="close-analytics-btn">✕</button>
+                    <button id="closeAnalyticsBtn" class="close-analytics-btn" style="display: none;">✕</button>
                 </div>
                 
-                <div class="analytics-url-info">
+                <div class="analytics-url-info" style="display: none;">
                     <label>Short URL:</label>
                     <div class="analytics-short-url" id="analyticsShortUrl"></div>
                 </div>
@@ -132,65 +176,10 @@
                             <div class="stat-label">Unique Visitors</div>
                         </div>
                     </div>
-                    
-                    <!-- Charts Section -->
-                    <div class="charts-section">
-                        <!-- Geographic Distribution -->
-                        <div class="chart-card">
-                            <h3>🌍 Geographic Distribution</h3>
-                            <div class="chart-content" id="countryChart">
-                                <div class="no-data">No data available</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Device Breakdown -->
-                        <div class="chart-card">
-                            <h3>📱 Device Types</h3>
-                            <div class="chart-content" id="deviceChart">
-                                <div class="no-data">No data available</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Browser Breakdown -->
-                        <div class="chart-card">
-                            <h3>🌐 Browsers</h3>
-                            <div class="chart-content" id="browserChart">
-                                <div class="no-data">No data available</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Traffic Sources -->
-                        <div class="chart-card">
-                            <h3>🔗 Traffic Sources</h3>
-                            <div class="chart-content" id="referrerChart">
-                                <div class="no-data">No data available</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Activity -->
-                    <div class="recent-activity">
-                        <h3>🕐 Recent Activity</h3>
-                        <div class="activity-list" id="activityList">
-                            <div class="no-data">No recent clicks</div>
-                        </div>
-                    </div>
                 </div>
-            </div>
-
-            <!-- Error State -->
-            <div id="errorState" class="error-state" style="display: none;">
-                <div class="error-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/>
-                        <path d="M12 8V12" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="12" cy="16" r="1" fill="#EF4444"/>
-                    </svg>
-                </div>
-                <p class="error-message" id="errorMessage"></p>
-                <button id="tryAgainBtn" class="try-again-btn">Try Again</button>
             </div>
         </div>
+        <!-- End Two Column Layout -->
     </div>
 
     <script src="script.js"></script>

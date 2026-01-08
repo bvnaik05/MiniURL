@@ -24,6 +24,8 @@ const closeAnalyticsBtn = document.getElementById('closeAnalyticsBtn');
 const analyticsShortUrl = document.getElementById('analyticsShortUrl');
 const analyticsLoading = document.getElementById('analyticsLoading');
 const analyticsContent = document.getElementById('analyticsContent');
+const analyticsUrlInput = document.getElementById('analyticsUrlInput');
+const fetchAnalyticsBtn = document.getElementById('fetchAnalyticsBtn');
 
 // ===========================
 // STATE MANAGEMENT
@@ -164,6 +166,9 @@ async function handleShortenUrl() {
         // Display result
         shortUrlDisplay.value = currentShortUrl;
         showState('result');
+        
+        // Auto-populate analytics input with the shortened URL
+        analyticsUrlInput.value = currentShortUrl;
         
         // Auto-select the URL for easy copying
         shortUrlDisplay.select();
@@ -500,6 +505,85 @@ closeAnalyticsBtn.addEventListener('click', handleCloseAnalytics);
 shortUrlDisplay.addEventListener('click', function() {
     this.select();
 });
+
+// Analytics input handler
+fetchAnalyticsBtn.addEventListener('click', handleFetchAnalytics);
+analyticsUrlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        handleFetchAnalytics();
+    }
+});
+
+// ===========================
+// ANALYTICS INPUT HANDLER
+// ===========================
+async function handleFetchAnalytics() {
+    const inputUrl = analyticsUrlInput.value.trim();
+    
+    if (!inputUrl) {
+        analyticsUrlInput.focus();
+        return;
+    }
+    
+    // Extract short code from URL (e.g., http://localhost:8080/abc123 -> abc123)
+    let shortCode;
+    try {
+        const url = new URL(inputUrl);
+        shortCode = url.pathname.substring(1); // Remove leading slash
+    } catch {
+        // If not a full URL, assume it's just the short code
+        shortCode = inputUrl.replace(/^\//, ''); // Remove leading slash if present
+    }
+    
+    if (!shortCode) {
+        alert('Please enter a valid short URL or short code');
+        return;
+    }
+    
+    // Show loading state
+    analyticsLoading.style.display = 'block';
+    analyticsContent.style.display = 'none';
+    
+    try {
+        // Fetch analytics
+        const data = await fetchAnalytics(shortCode);
+        
+        // Check if there's any data
+        if (data.totalClicks === 0) {
+            analyticsLoading.innerHTML = `
+                <div style="color: white; padding: 3rem; text-align: center;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 1rem; opacity: 0.5;">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <h3 style="margin-bottom: 1rem;">No Analytics Data Yet</h3>
+                    <p style="opacity: 0.8; margin-bottom: 1rem;">This URL hasn't been clicked yet.</p>
+                    <p style="opacity: 0.7; font-size: 0.9rem;">
+                        Click the short URL to generate analytics data
+                    </p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Display analytics
+        displayAnalytics(data);
+        
+        // Show content, hide loading
+        analyticsLoading.style.display = 'none';
+        analyticsContent.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error fetching analytics:', error);
+        analyticsLoading.innerHTML = `
+            <div style="color: white; padding: 2rem; text-align: center;">
+                <p>❌ Failed to load analytics</p>
+                <p style="font-size: 0.9rem; opacity: 0.8;">${error.message}</p>
+                <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 1rem;">Make sure the short URL exists</p>
+            </div>
+        `;
+    }
+}
 
 // ===========================
 // INITIALIZATION
