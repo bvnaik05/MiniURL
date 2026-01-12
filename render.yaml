@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: miniurl-backend
+    env: java
+    region: singapore
+    buildCommand: cd backend/miniURL && mvn clean package -DskipTests
+    startCommand: cd backend/miniURL && java -jar target/miniURL-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: DATABASE_DRIVER
+        value: org.postgresql.Driver
+      - key: HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: JAVA_OPTS
+        value: "-Xmx512m"
