@@ -458,7 +458,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👨‍💻 Author
 
-**Bhargav Naik**
+**Bhargavi Naik**
 - GitHub: [@bvnaik05](https://github.com/bvnaik05)
 
 ---
