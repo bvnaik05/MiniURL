@@ -17,21 +17,10 @@ const shortenAnotherBtn = document.getElementById('shortenAnotherBtn');
 const tryAgainBtn = document.getElementById('tryAgainBtn');
 const errorMessage = document.getElementById('errorMessage');
 
-// Analytics DOM Elements
-const viewAnalyticsBtn = document.getElementById('viewAnalyticsBtn');
-const analyticsSection = document.getElementById('analyticsSection');
-const closeAnalyticsBtn = document.getElementById('closeAnalyticsBtn');
-const analyticsShortUrl = document.getElementById('analyticsShortUrl');
-const analyticsLoading = document.getElementById('analyticsLoading');
-const analyticsContent = document.getElementById('analyticsContent');
-const analyticsUrlInput = document.getElementById('analyticsUrlInput');
-const fetchAnalyticsBtn = document.getElementById('fetchAnalyticsBtn');
-
 // ===========================
 // STATE MANAGEMENT
 // ===========================
 let currentShortUrl = '';
-let currentShortCode = '';
 
 // ===========================
 // UTILITY FUNCTIONS
@@ -161,14 +150,10 @@ async function handleShortenUrl() {
         
         // Store result
         currentShortUrl = data.shortUrl;
-        currentShortCode = data.shortCode; // Store short code for analytics
         
         // Display result
         shortUrlDisplay.value = currentShortUrl;
         showState('result');
-        
-        // Auto-populate analytics input with the shortened URL
-        analyticsUrlInput.value = currentShortUrl;
         
         // Auto-select the URL for easy copying
         shortUrlDisplay.select();
@@ -243,254 +228,6 @@ function handleKeyPress(event) {
 }
 
 // ===========================
-// ANALYTICS FUNCTIONS
-// ===========================
-
-/**
- * Fetch analytics data from backend
- * 
- * WHAT THIS DOES:
- * Calls GET /analytics/{shortCode} to get all stats
- * Returns comprehensive analytics data for display
- */
-async function fetchAnalytics(shortCode) {
-    console.log('Fetching analytics for:', shortCode);
-    const url = `${API_BASE_URL}/analytics/${shortCode}`;
-    console.log('Analytics URL:', url);
-    
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-        throw new Error('Failed to fetch analytics data');
-    }
-    
-    const data = await response.json();
-    console.log('Analytics data received:', data);
-    return data;
-}
-
-/**
- * Handle "View Analytics" button click
- * 
- * WHAT HAPPENS:
- * 1. Show loading spinner
- * 2. Fetch analytics from backend
- * 3. Display all charts and stats
- * 4. Show recent activity
- */
-async function handleViewAnalytics() {
-    if (!currentShortCode) {
-        return;
-    }
-    
-    // Show analytics section with loading state
-    analyticsSection.style.display = 'block';
-    analyticsLoading.style.display = 'block';
-    analyticsContent.style.display = 'none';
-    analyticsShortUrl.textContent = currentShortUrl;
-    
-    // Scroll to analytics section smoothly
-    analyticsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-    try {
-        // Fetch data
-        const data = await fetchAnalytics(currentShortCode);
-        
-        // Check if there's any data
-        if (data.totalClicks === 0) {
-            analyticsLoading.innerHTML = `
-                <div style="color: white; padding: 3rem; text-align: center;">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 1rem; opacity: 0.5;">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    <h3 style="margin-bottom: 1rem;">No Analytics Data Yet</h3>
-                    <p style="opacity: 0.8; margin-bottom: 1rem;">This URL hasn't been clicked yet.</p>
-                    <p style="opacity: 0.7; font-size: 0.9rem;">
-                        Click the short URL to generate analytics data:<br>
-                        <code style="background: rgba(0,0,0,0.3); padding: 0.5rem 1rem; border-radius: 8px; display: inline-block; margin-top: 0.5rem;">${currentShortUrl}</code>
-                    </p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Display all analytics
-        displayAnalytics(data);
-        
-        // Show content, hide loading
-        analyticsLoading.style.display = 'none';
-        analyticsContent.style.display = 'block';
-        
-    } catch (error) {
-        console.error('Error fetching analytics:', error);
-        analyticsLoading.innerHTML = `
-            <div style="color: white; padding: 2rem;">
-                <p>❌ Failed to load analytics</p>
-                <p style="font-size: 0.9rem; opacity: 0.8;">${error.message}</p>
-            </div>
-        `;
-    }
-}
-
-/**
- * Display all analytics data
- * 
- * WHAT THIS DOES:
- * Takes the analytics object from backend and renders:
- * - Stats cards (total clicks, unique visitors)
- * - Bar charts (country, device, browser, referrers)
- * - Recent activity list
- */
-function displayAnalytics(data) {
-    console.log('Displaying analytics with data:', data);
-    
-    // Update stats cards
-    document.getElementById('totalClicks').textContent = formatNumber(data.totalClicks || 0);
-    document.getElementById('uniqueVisitors').textContent = formatNumber(data.uniqueVisitors || 0);
-    
-    // Render charts
-    renderBarChart('countryChart', data.clicksByCountry || []);
-    renderBarChart('deviceChart', data.clicksByDevice || []);
-    renderBarChart('browserChart', data.clicksByBrowser || []);
-    renderBarChart('referrerChart', data.topReferrers || []);
-    
-    // Render recent activity
-    renderRecentActivity(data.recentClicks || []);
-}
-
-/**
- * Render a bar chart
- * 
- * WHAT THIS DOES:
- * Creates horizontal bar chart from data
- * Each bar shows label (e.g., "USA") and value (e.g., 500 clicks)
- * Bar width is proportional to percentage of total
- * 
- * EXAMPLE DATA:
- * [
- *   {label: "USA", value: 500},
- *   {label: "India", value: 300},
- *   {label: "UK", value: 200}
- * ]
- */
-function renderBarChart(elementId, data) {
-    const container = document.getElementById(elementId);
-    
-    if (!data || data.length === 0) {
-        container.innerHTML = '<div class="no-data">No data available</div>';
-        return;
-    }
-    
-    // Find max value for percentage calculation
-    const maxValue = Math.max(...data.map(item => item.value));
-    
-    // Generate HTML for bars
-    const html = data.slice(0, 5).map(item => {
-        const percentage = (item.value / maxValue) * 100;
-        return `
-            <div class="chart-bar-container">
-                <div class="chart-bar-label">
-                    <span class="chart-bar-label-text">${item.label || 'Unknown'}</span>
-                    <span class="chart-bar-label-value">${formatNumber(item.value)}</span>
-                </div>
-                <div class="chart-bar-track">
-                    <div class="chart-bar-fill" style="width: ${percentage}%"></div>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    container.innerHTML = html;
-}
-
-/**
- * Render recent activity list
- * 
- * WHAT THIS DOES:
- * Shows last 10 clicks with details:
- * - When (timestamp)
- * - Where from (country/city)
- * - Device/Browser
- * - Referrer
- * 
- * EXAMPLE ITEM:
- * {
- *   clickedAt: "2026-01-06T15:30:45",
- *   country: "USA",
- *   city: "New York",
- *   browser: "Chrome",
- *   os: "Windows",
- *   deviceType: "Computer",
- *   referrer: "twitter.com"
- * }
- */
-function renderRecentActivity(clicks) {
-    const container = document.getElementById('activityList');
-    
-    if (!clicks || clicks.length === 0) {
-        container.innerHTML = '<div class="no-data">No recent clicks</div>';
-        return;
-    }
-    
-    const html = clicks.map(click => {
-        const time = formatDateTime(click.clickedAt);
-        const location = [click.city, click.country].filter(Boolean).join(', ') || 'Unknown';
-        
-        return `
-            <div class="activity-item">
-                <div class="activity-time">${time}</div>
-                <div class="activity-details">
-                    <span class="activity-tag">📍 ${location}</span>
-                    <span class="activity-tag">💻 ${click.deviceType || 'Unknown'}</span>
-                    <span class="activity-tag">🌐 ${click.browser || 'Unknown'}</span>
-                    ${click.referrer && click.referrer !== 'direct' 
-                        ? `<span class="activity-tag">🔗 ${click.referrer}</span>` 
-                        : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    container.innerHTML = html;
-}
-
-/**
- * Handle close analytics button
- */
-function handleCloseAnalytics() {
-    analyticsSection.style.display = 'none';
-}
-
-/**
- * Format large numbers with commas
- * Example: 1247 → "1,247"
- */
-function formatNumber(num) {
-    return num.toLocaleString();
-}
-
-/**
- * Format datetime for display
- * Example: "2026-01-06T15:30:45" → "Jan 6, 2026 at 3:30 PM"
- */
-function formatDateTime(dateString) {
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    } catch (e) {
-        return dateString;
-    }
-}
-
-// ===========================
 // EVENT LISTENERS
 // ===========================
 shortenBtn.addEventListener('click', handleShortenUrl);
@@ -498,92 +235,11 @@ copyBtn.addEventListener('click', handleCopyUrl);
 shortenAnotherBtn.addEventListener('click', handleShortenAnother);
 tryAgainBtn.addEventListener('click', handleTryAgain);
 urlInput.addEventListener('keypress', handleKeyPress);
-viewAnalyticsBtn.addEventListener('click', handleViewAnalytics);
-closeAnalyticsBtn.addEventListener('click', handleCloseAnalytics);
 
 // Also allow clicking on the short URL input to copy
 shortUrlDisplay.addEventListener('click', function() {
     this.select();
 });
-
-// Analytics input handler
-fetchAnalyticsBtn.addEventListener('click', handleFetchAnalytics);
-analyticsUrlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        handleFetchAnalytics();
-    }
-});
-
-// ===========================
-// ANALYTICS INPUT HANDLER
-// ===========================
-async function handleFetchAnalytics() {
-    const inputUrl = analyticsUrlInput.value.trim();
-    
-    if (!inputUrl) {
-        analyticsUrlInput.focus();
-        return;
-    }
-    
-    // Extract short code from URL (e.g., http://localhost:8080/abc123 -> abc123)
-    let shortCode;
-    try {
-        const url = new URL(inputUrl);
-        shortCode = url.pathname.substring(1); // Remove leading slash
-    } catch {
-        // If not a full URL, assume it's just the short code
-        shortCode = inputUrl.replace(/^\//, ''); // Remove leading slash if present
-    }
-    
-    if (!shortCode) {
-        alert('Please enter a valid short URL or short code');
-        return;
-    }
-    
-    // Show loading state
-    analyticsLoading.style.display = 'block';
-    analyticsContent.style.display = 'none';
-    
-    try {
-        // Fetch analytics
-        const data = await fetchAnalytics(shortCode);
-        
-        // Check if there's any data
-        if (data.totalClicks === 0) {
-            analyticsLoading.innerHTML = `
-                <div style="color: white; padding: 3rem; text-align: center;">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 1rem; opacity: 0.5;">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    <h3 style="margin-bottom: 1rem;">No Analytics Data Yet</h3>
-                    <p style="opacity: 0.8; margin-bottom: 1rem;">This URL hasn't been clicked yet.</p>
-                    <p style="opacity: 0.7; font-size: 0.9rem;">
-                        Click the short URL to generate analytics data
-                    </p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Display analytics
-        displayAnalytics(data);
-        
-        // Show content, hide loading
-        analyticsLoading.style.display = 'none';
-        analyticsContent.style.display = 'block';
-        
-    } catch (error) {
-        console.error('Error fetching analytics:', error);
-        analyticsLoading.innerHTML = `
-            <div style="color: white; padding: 2rem; text-align: center;">
-                <p>❌ Failed to load analytics</p>
-                <p style="font-size: 0.9rem; opacity: 0.8;">${error.message}</p>
-                <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 1rem;">Make sure the short URL exists</p>
-            </div>
-        `;
-    }
-}
 
 // ===========================
 // INITIALIZATION

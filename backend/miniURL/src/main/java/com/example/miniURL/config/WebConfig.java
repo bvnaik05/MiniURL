@@ -35,12 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Apply to all endpoints
-                .allowedOrigins(
-                    "http://localhost:3000",     // React default
-                    "http://localhost:5173",     // Vite default
-                    "http://localhost:8080",     // Same-origin (optional)
-                    "https://your-frontend-domain.com"  // Update with your actual domain
-                )
+                .allowedOriginPatterns("*") // Allow all origins including file://
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)

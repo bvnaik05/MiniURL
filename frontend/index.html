@@ -36,11 +36,9 @@
         </div>
 
         <!-- Two Column Layout -->
-        <div class="two-column-layout">
-            <!-- Left Column: URL Shortener -->
-            <div class="left-column">
-                <!-- Glass Card -->
-                <div class="glass-card"
+        <div class="main-content">
+            <!-- Glass Card -->
+            <div class="glass-card">
             <!-- URL Input Section -->
             <div class="input-section">
                 <label class="input-label">Enter the long URL here:</label>
@@ -100,10 +98,6 @@
                 <button id="shortenAnotherBtn" class="shorten-another-btn">
                     Shorten Another URL
                 </button>
-                
-                <button id="viewAnalyticsBtn" class="view-analytics-btn" style="display: none;">
-                    📊 View Analytics
-                </button>
             </div>
 
             <!-- Error State -->
@@ -119,67 +113,6 @@
                 <button id="tryAgainBtn" class="try-again-btn">Try Again</button>
             </div>
         </div>
-        </div>
-
-            <!-- Right Column: Analytics -->
-            <div class="right-column">
-                <div class="glass-card analytics-card">
-                    <h2 class="analytics-title">📊 Analytics Dashboard</h2>
-                    
-                    <!-- Analytics Input Section -->
-                    <div class="analytics-input-section">
-                        <label class="analytics-label">Enter Short URL to view analytics:</label>
-                        <div class="analytics-input-wrapper">
-                            <input 
-                                type="text" 
-                                id="analyticsUrlInput" 
-                                placeholder="e.g., http://localhost:8080/abc123"
-                                class="analytics-url-input"
-                            >
-                            <button id="fetchAnalyticsBtn" class="fetch-analytics-btn">
-                                View
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Analytics Dashboard -->
-                    <!-- Analytics Dashboard -->
-                    <div id="analyticsSection" class="analytics-section">
-                <div class="analytics-header" style="display: none;">
-                    <h2>📊 URL Analytics</h2>
-                    <button id="closeAnalyticsBtn" class="close-analytics-btn" style="display: none;">✕</button>
-                </div>
-                
-                <div class="analytics-url-info" style="display: none;">
-                    <label>Short URL:</label>
-                    <div class="analytics-short-url" id="analyticsShortUrl"></div>
-                </div>
-                
-                <!-- Loading State for Analytics -->
-                <div id="analyticsLoading" class="analytics-loading">
-                    <div class="spinner"></div>
-                    <p>Loading analytics data...</p>
-                </div>
-                
-                <!-- Analytics Content -->
-                <div id="analyticsContent" class="analytics-content" style="display: none;">
-                    <!-- Stats Overview -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-value" id="totalClicks">0</div>
-                            <div class="stat-label">Total Clicks</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">✨</div>
-                            <div class="stat-value" id="uniqueVisitors">0</div>
-                            <div class="stat-label">Unique Visitors</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End Two Column Layout -->
     </div>
 
     <script src="script.js"></script>
